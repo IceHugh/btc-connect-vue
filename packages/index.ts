@@ -1,9 +1,9 @@
 import WalletConnect from './WalletConnect.vue'
 import WalletSelectModal from './WalletSelectModal.vue'
-
+import { useWalletStore } from './store'
 import './style.css'
 // 按需引入
-export { WalletConnect, WalletSelectModal }
+export { WalletConnect, WalletSelectModal, useWalletStore }
 
 console.log('BtcConnectUI', WalletConnect)
 const component = [WalletConnect, WalletSelectModal]

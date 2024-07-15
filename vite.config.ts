@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite'
-import { resolve } from 'path'
-import vue from '@vitejs/plugin-vue'
-import terser from '@rollup/plugin-terser'
-import dts from 'vite-plugin-dts'
+import { defineConfig } from 'vite';
+import { resolve } from 'path';
+import vue from '@vitejs/plugin-vue';
+import terser from '@rollup/plugin-terser';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig({
   build: {
@@ -11,9 +11,7 @@ export default defineConfig({
     //压缩
     //minify: false,
     rollupOptions: {
-      plugins: [
-        terser()
-      ],
+      plugins: [terser()],
       external: ['vue', 'btc-connect'],
       output: {
         name: 'BtcConnectVue',
@@ -31,5 +29,10 @@ export default defineConfig({
   },
   plugins: [
     vue(),
+    dts({
+      insertTypesEntry: true,
+      cleanVueFileName: true,
+      include: ['packages/**/*'],
+    }),
   ],
-})
+});

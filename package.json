@@ -18,8 +18,9 @@
   "bugs": {
     "url": "https://github.com/IceHugh/btc-connect-vue/issues"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
+  "types": "dist/index.d.ts",
   "main": "dist/btc-connect-vue.umd.cjs",
   "module": "dist/btc-connect-vue.js",
   "browser": "dist/btc-connect-vue.js",
