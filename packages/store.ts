@@ -1,21 +1,22 @@
+// src/stores/useWalletStore.ts
 import { ref } from 'vue';
-
+declare global {
+  interface Window {
+    btcWallet: any;
+  }
+}
 import {
-  type BtcWalletConnectOptions,
+  BtcWalletConnectOptions,
   Balance,
   BtcWalletNetwork,
   BtcConnectorId,
 } from './type';
 import BtcWalletConnect, { Connector } from 'btc-connect';
 
-declare global {
-  interface Window {
-    btcWallet: any;
-  }
-}
+// 创建一个闭包来存储单例的状态
+let instance: ReturnType<typeof createStore> | null = null;
 
-export function useWalletStore() {
-  // State
+const createStore = () => {
   const btcWallet = ref<BtcWalletConnect | undefined>();
   const balance = ref<Balance>({ confirmed: 0, unconfirmed: 0, total: 0 });
   const publicKey = ref<string>('');
@@ -38,10 +39,10 @@ export function useWalletStore() {
     | undefined
   >();
 
-  // Actions
   const setModalVisible = (visible: boolean) => {
     modalVisible.value = visible;
   };
+
 
   const init = (config: BtcWalletConnectOptions = {}) => {
     try {
@@ -183,4 +184,11 @@ export function useWalletStore() {
     disconnect,
     switchNetwork,
   };
-}
+};
+
+export const useWalletStore = () => {
+  if (!instance) {
+    instance = createStore();
+  }
+  return instance;
+};

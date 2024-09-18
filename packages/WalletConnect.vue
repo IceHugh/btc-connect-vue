@@ -1,11 +1,7 @@
 <template>
   <div>
-    <button
-      @click="handleConnect"
-      v-if="!connected"
-      :class="buttonClass"
-    >
-      {{connectText}}
+    <button @click="handleConnect" v-if="!connected" :class="buttonClass">
+      {{ connectText }}
     </button>
     <WalletSelectModal
       v-if="!connected"
@@ -19,10 +15,7 @@
       @click="walletSelect"
     />
     <slot v-else>
-      <button
-        @click="handlerDisconnect"
-        :class="disconnectButtonClass"
-      >
+      <button @click="handlerDisconnect" :class="disconnectButtonClass">
         <span class="mr-1">{{ hideStr(address, 4, '***') }}</span>
         <!-- <ExitIcon :class="exitIconClass" /> -->
       </button>
@@ -39,6 +32,8 @@ import BtcWalletConnect from 'btc-connect';
 import { useWalletStore } from './store';
 import { BtcWalletConnectOptions, BtcConnectorId } from './type';
 
+// 完成test
+//
 interface WalletConnectProps {
   config?: BtcWalletConnectOptions;
   theme?: 'light' | 'dark';
@@ -53,15 +48,17 @@ interface WalletConnectProps {
     disconnectText?: string;
     modalTitle?: string;
   };
-  onConnectSuccess?: (btcWallet: BtcWalletConnect) => void;
-  onConnectError?: (error: any) => void;
-  onDisconnectSuccess?: () => void;
-  onDisconnectError?: (error: any) => void;
   children?: any;
 }
 
 const props = defineProps<WalletConnectProps>();
 
+const emits = defineEmits<{
+  (e: 'connect-success', btcWallet: BtcWalletConnect): void;
+  (e: 'connect-error', error: any): void;
+  (e: 'disconnect-success'): void;
+  (e: 'disconnect-error', error: any): void;
+}>();
 const {
   connect,
   modalVisible,
@@ -71,7 +68,6 @@ const {
   address,
   init,
   disconnect,
-  initStatus,
   btcWallet,
   switchConnector,
 } = useWalletStore();
@@ -85,22 +81,22 @@ const walletSelect = async (id: BtcConnectorId) => {
   try {
     await connect();
     if (btcWallet) {
-      await props.onConnectSuccess?.(btcWallet as any);
+      emits('connect-success', btcWallet as any);
       setModalVisible(false);
     }
   } catch (error) {
     console.error(error);
-    props.onConnectError?.(error);
+    emits('connect-error', error);
   }
 };
 
 const handlerDisconnect = async () => {
   try {
-    await props.onDisconnectSuccess?.();
+    emits('disconnect-success');
     await disconnect();
   } catch (error) {
     console.error(error);
-    props.onDisconnectError?.(error);
+    emits('disconnect-error', error);
   }
 };
 
@@ -132,24 +128,15 @@ const disconnectButtonClass = computed(
     } ${props.ui?.disconnectClass || ''}`,
 );
 
-const exitIconClass = computed(
-  () => `${props.theme === 'dark' ? 'text-white' : 'text-black'}`,
-);
+// const exitIconClass = computed(
+//   () => `${props.theme === 'dark' ? 'text-white' : 'text-black'}`,
+// );
 
 const {
   config: { network = 'livenet', defaultConnectorId = 'unisat' } = {},
   theme = 'dark',
-  ui: {
-    connectClass = '',
-    disconnectClass = '',
-    modalClass = '',
-    modalZIndex = 100,
-  } = {},
-  text: {
-    connectText = 'Connect',
-    disconnectText = 'Disconnect',
-    modalTitle = 'Select Wallet',
-  } = {},
+  ui: { modalClass = '', modalZIndex = 100 } = {},
+  text: { connectText = 'Connect', modalTitle = 'Select Wallet' } = {},
 } = props;
 
 onMounted(() => {
